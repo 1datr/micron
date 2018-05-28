@@ -9,9 +9,9 @@ class ModuleExecuter {
 	function load_modules()
 	{
 		// load modules settings
-		if(file_exists("./modules/$mod/index.php"))
+		if(file_exists("./modules/settings.php"))
 		{
-			include "./modules/$mod/index.php";
+			include "./modules/settings.php";
 			$this->_SETTINGS = $enabled_modules;
 		}
 		//
@@ -43,7 +43,7 @@ class ModuleExecuter {
 			if($this->module_loaded($mod))
 				return true;
 			
-			if($this->module_enabled($mod))
+			if(!$this->module_enabled($mod))
 			{
 				return false;
 			}
@@ -95,6 +95,7 @@ class ModuleExecuter {
 	
 	function module_enabled($modname)
 	{
+		$res = false;
 		foreach ($this->_SETTINGS as $idx => $word)
 		{
 			$res = match_mask($word,$modname);
