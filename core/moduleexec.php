@@ -70,7 +70,7 @@ class ModuleExecuter {
 		return true;
 	}
 	
-	function call_module($modname,$method,$params)
+	function call_module($modname,$method,&$params)
 	{
 		if(isset($this->_SETTINGS[$modname]))
 		{
@@ -131,7 +131,7 @@ class ModuleExecuter {
 		}
 		return $modlist;
 	}
-
+	// call event
 	function call_event($_event,$_params=[],$priority=null)
 	{
 		$mod_keys = array_keys($this->_MODULES_OBJS);
@@ -148,8 +148,7 @@ class ModuleExecuter {
 				else 
 				{
 					$mod_keys_new[]=$pr_element;
-				}
-				//
+				}				
 			}
 			
 			foreach ($mod_keys as $idx => $mod)
