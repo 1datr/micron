@@ -490,6 +490,23 @@ function get_files_in_folder($dir_path,$opts=array())
 	return $result;
 }
 
+function is_mask($mask)
+{
+	return strpos($mask, "*");	
+}
+
+function match_mask($mask,$str)
+{
+	if(strpos($mask, "*"))
+	{
+		$pattern = strtr($mask,".*",".*");
+		$pattern = "/$pattern/Uis";
+		return preg_match_all($pattern, $str);
+	}
+	else 
+		return ($mask==$str);
+}
+
 function get_nested_dirs($the_dir)
 {
 	$filelist = get_files_in_folder($the_dir);

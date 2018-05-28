@@ -24,9 +24,9 @@ namespace Core {
 			$this->ME = $_ME;
 		}
 		
-		public function call_event($_ev,$_params)
+		public function call_event($_ev,$_params,$priorities=null)
 		{
-			$this->ME->call_event($this->_MOD_NAME.".".$_ev,$_params);
+			$this->ME->call_event($this->_MOD_NAME.".".$_ev,$_params,$priorities);
 		}
 		
 	}

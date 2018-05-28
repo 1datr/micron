@@ -1,5 +1,5 @@
 <?php
-namespace modules\html{
+namespace modules\base\html{
 use Core;
 
 class Module extends Core\Module 
@@ -16,7 +16,7 @@ class Module extends Core\Module
 		 </head>
 		 <body>
 		 <?php 
-		 $this->call_event('onbody', [])
+		 $this->call_event('onbody', [],['base.html.js'])
 		 ?>
 		 </body>
 		 </html>
