@@ -1,5 +1,3 @@
 <?php
-$enabled_modules=['base.*',		
-//'azure.css'		
-];
+$enabled_modules=['base.*','mulgach'];
 ?>

@@ -1,18 +1,20 @@
 <?php
-namespace modules\base\html\js{
+namespace modules\mulgach{
 use Core;
 
 class Module extends Core\Module 
 	{		
 		
-		function base_html_onbody($params)
+		function base_html_page_beforepage(&$params)
 		{
-			//echo "<h1>Hello, World</h1>";
+			if($_REQUEST['r']=='r777')
+				echo "@@###@@";	
+			$params['_page_path'] = "./pages/about.php";
 		}
 		
 		function base_html_onhead($params)
 		{
-			$this->call_event('onjs', []);
+
 		}
 		
 		function core_onload()
