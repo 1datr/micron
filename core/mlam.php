@@ -1,7 +1,7 @@
 <?php
-// modules executer class
+// module loader and manager
 
-class ModuleExecuter {
+class MLAM {
 
 	var $_MODULES_OBJS=[];
 	var $_SETTINGS=[];
@@ -19,7 +19,7 @@ class ModuleExecuter {
 		foreach ($modules as $mod)
 		{							
 				
-			$mod_make_res = $this->make_module_obj($mod);
+			$mod_make_res = $this->load_module($mod);
 		}
 	}
 
@@ -29,9 +29,17 @@ class ModuleExecuter {
 	}
 
 	// создать объект модуля
-	function make_module_obj($mod)
+	function load_module($mod)
 	{
 		try{
+			
+			if($this->module_loaded($mod)) // модуль уже загружен
+				return true;
+					
+			if(!$this->module_enabled($mod)) // модуль недоступен
+			{
+				return false;
+			}
 			
 			if(file_exists("./modules/$mod/index.php"))
 			{
@@ -40,13 +48,7 @@ class ModuleExecuter {
 			else 
 				return false;
 			
-			if($this->module_loaded($mod))
-				return true;
 			
-			if(!$this->module_enabled($mod))
-			{
-				return false;
-			}
 					
 			$mod_class = $this->get_mod_class_name($mod);
 								
@@ -56,8 +58,11 @@ class ModuleExecuter {
 			$req_modules = $mod_obj->required();
 			foreach($req_modules as $req)
 			{						
-				if(!$this->make_module_obj($req))
-					return false;
+				if(!$this->load_module($req))
+				{
+					$this->gen_error("Module $req is disabled or not exists");
+					return false;					
+				}
 			}
 					
 			$this->_MODULES_OBJS[$mod] = $mod_obj;
@@ -81,6 +86,13 @@ class ModuleExecuter {
 			$this->err_log("Module not exists");
 			return null;
 		}
+	}
+	
+	function gen_error($err)
+	{
+		$this->call_event('mlam_error');
+		echo "<font color='red'><h1>$err</h1></font>";
+		die();
 	}
 	
 	function err_log($err)
@@ -136,7 +148,7 @@ class ModuleExecuter {
 	{
 		$mod_keys = array_keys($this->_MODULES_OBJS);
 		$mod_keys_new = [];
-		if($priority!=null)
+		if($priority!=null) // если задан приоритет отработки модулей
 		{			
 			foreach ($priority as $pr_element)
 			{
@@ -161,7 +173,7 @@ class ModuleExecuter {
 			
 			$mod_keys = $mod_keys_new;
 		}
-		
+		// отрабатываем
 		foreach ($mod_keys as $idx => $modname)
 		{
 			$mod_obj = $this->_MODULES_OBJS[$modname];
@@ -179,3 +191,4 @@ class ModuleExecuter {
 	}
 
 }
+

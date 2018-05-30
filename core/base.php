@@ -29,6 +29,16 @@ namespace Core {
 			$this->ME->call_event($this->_MOD_NAME.".".$_ev,$_params,$priorities);
 		}
 		
+		public function install()
+		{
+			
+		}
+		
+		public function uninstall()
+		{
+				
+		}
+		
 	}
 
 }
