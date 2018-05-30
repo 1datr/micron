@@ -7,9 +7,11 @@ namespace Core {
 		
 		VAR $_MOD_NAME;
 		
-		function __construct()
-		{
+		VAR $MODE;
 		
+		function __construct($MODE='use')
+		{
+			$this->MODE=$MODE;
 		}
 		
 		public function required()
@@ -36,7 +38,7 @@ namespace Core {
 		
 		public function uninstall()
 		{
-				
+			
 		}
 		
 	}

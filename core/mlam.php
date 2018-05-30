@@ -9,12 +9,12 @@ class MLAM {
 	function load_modules()
 	{
 		// load modules settings
-		if(file_exists("./modules/settings.php"))
-		{
-			include "./modules/settings.php";
-			$this->_SETTINGS = $enabled_modules;
-		}
+		
+		
+		$fp_settings  = new FilePair("./modules/settings.php");
 		//
+		$this->_SETTINGS = $fp_settings->get_settings();
+		
 		$modules = get_files_in_folder('modules',['dirs'=>true,'basename'=>true]);
 		foreach ($modules as $mod)
 		{							
@@ -74,7 +74,7 @@ class MLAM {
 
 		return true;
 	}
-	
+	// обращение прямое к функции модуля
 	function call_module($modname,$method,&$params)
 	{
 		if(isset($this->_SETTINGS[$modname]))
@@ -105,10 +105,15 @@ class MLAM {
 		return (isset($this->_MODULES_OBJS[$_mod]));
 	}
 	
+	function module_exists($modname)
+	{
+		return (file_exists("./modules/$modname/index.php"));		
+	}
+	// check if module enabled
 	function module_enabled($modname)
 	{
 		$res = false;
-		foreach ($this->_SETTINGS as $idx => $word)
+		foreach ($this->_SETTINGS['enable_modules'] as $idx => $word)
 		{
 			$res = match_mask($word,$modname);
 			if($res) return  $res;
@@ -174,15 +179,18 @@ class MLAM {
 			$mod_keys = $mod_keys_new;
 		}
 		// отрабатываем
+		$ev_results = [];
 		foreach ($mod_keys as $idx => $modname)
 		{
 			$mod_obj = $this->_MODULES_OBJS[$modname];
 			$ev_func_name = $this->event_function_name($_event);
 			if(method_exists($mod_obj, $ev_func_name))
 			{
-				$mod_obj->$ev_func_name($_params);
+				$ev_res = $mod_obj->$ev_func_name($_params);
+				$ev_results[$modname]=$ev_res;
 			}
 		}
+		return $ev_results;
 	}
 
 	function event_function_name($ev_name)

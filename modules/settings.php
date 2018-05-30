@@ -1,3 +1,5 @@
 <?php
-$enabled_modules=['base.*','mulgach'];
+// 
+$_SETTINGS=[
+		'enable_modules'=>['base.*','mulgach','mall']];
 ?>
