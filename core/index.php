@@ -7,3 +7,4 @@ use \Core;
 $_MLAM = new MLAM();
 $_MLAM->load_modules();
 $_MLAM->call_event('core.onload');
+$_MLAM->save_modules();

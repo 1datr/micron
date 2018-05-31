@@ -5,6 +5,7 @@ class MLAM {
 
 	var $_MODULES_OBJS=[];
 	var $_SETTINGS=[];
+	var $_MUST_SAVE=[];
 
 	function load_modules()
 	{
@@ -51,8 +52,23 @@ class MLAM {
 			
 					
 			$mod_class = $this->get_mod_class_name($mod);
-								
-			$mod_obj = new $mod_class();
+			
+			$mod_settings = $mod_class::settings();
+			if($mod_settings['sess_save'])
+			{
+				$this->_MUST_SAVE[]=$mod;
+				
+				$mod_obj = $this->unserialize($mod);
+				if($mod_obj===null)
+				{
+					$mod_obj = new $mod_class();
+					$mod_obj->onload_basic();
+				}
+			}
+			else
+			{
+				$mod_obj = new $mod_class();
+			}
 			$mod_obj->_MOD_NAME = $mod;
 			$mod_obj->set_ME($this);
 			$req_modules = $mod_obj->required();
@@ -73,6 +89,31 @@ class MLAM {
 		}
 
 		return true;
+	}
+	// сераиализовать модули, которые нужно
+	public function save_modules()
+	{
+		foreach ($this->_MUST_SAVE as $_mod)
+		{
+			$this->serialize_module($_mod);
+		}
+	}
+	// сериализовать модуль 
+	function serialize_module($modname)
+	{
+		$_mod_ser = serialize($this->_MODULES_OBJS[$modname]);
+		if(!isset($_SESSION['_SER_MODS']))
+		{
+			$_SESSION['_SER_MODS']=[];
+		}
+		$_SESSION['_SER_MODS'][$modname]=$_mod_ser;
+	}
+	
+	function unserialize($modname)
+	{
+		if(isset($_SESSION['_SER_MODS'][$modname]))
+	   		return unserialize($_SESSION['_SER_MODS'][$modname]);
+		return null;
 	}
 	// обращение прямое к функции модуля
 	function call_module($modname,$method,&$params)

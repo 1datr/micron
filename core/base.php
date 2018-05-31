@@ -14,6 +14,16 @@ namespace Core {
 			$this->MODE=$MODE;
 		}
 		
+		public function onload_basic()
+		{
+			
+		}
+		
+		public static function settings()
+		{
+			return ['sess_save'=>false];
+		}
+		
 		public function required()
 		{
 			return [];
