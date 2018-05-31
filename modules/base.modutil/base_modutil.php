@@ -18,6 +18,13 @@ class Module extends Core\Module
 		
 		function base_html_onbody($params)
 		{
+			$fruits=['apple','pear','cherry','arbuz'];
+			
+			__foreach($fruits, function($idx,$val)
+			{
+				
+			} );
+			
 			echo "<br /><font color=\"blue\" >{$this->ctr}</font>";
 			if($this->ctr==10)
 			{
