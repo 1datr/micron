@@ -12,7 +12,7 @@ class Module extends Core\Module
 		
 		function base_html_onhead($params)
 		{
-			$this->call_event('onjs', []);
+			$res = $this->call_event('onjs', []);
 		}
 		
 		function core_onload()

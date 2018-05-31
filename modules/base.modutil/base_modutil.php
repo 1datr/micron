@@ -19,8 +19,17 @@ class Module extends Core\Module
 		function base_html_onbody($params)
 		{
 			echo "<br /><font color=\"blue\" >{$this->ctr}</font>";
+			if($this->ctr==10)
+			{
+				$this->call_event_sess('on_counted', ['ctr'=>$this->ctr]);
+			}
 			$this->ctr++;
 			$this->ctr%=20;
+		}
+		
+		function base_modutil_on_counted($params)
+		{
+			echo "<h3>Hello, world</h3>";
 		}
 	
 	}	

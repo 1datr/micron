@@ -29,6 +29,10 @@ class MLAM {
 		return "modules\\".str_replace('.', '\\', $mod)."\Module";
 	}
 
+	private function main_mod_file_name($mod)
+	{
+		return "./modules/$mod/".strtr($mod,'.','_').".php";
+	}
 	// создать объект модуля
 	function load_module($mod)
 	{
@@ -42,9 +46,10 @@ class MLAM {
 				return false;
 			}
 			
-			if(file_exists("./modules/$mod/index.php"))
+			$_main_file = $this->main_mod_file_name($mod);
+			if(file_exists($_main_file))
 			{
-				require_once "./modules/$mod/index.php";
+				require_once $_main_file;
 			}
 			else 
 				return false;
@@ -234,6 +239,29 @@ class MLAM {
 		return $ev_results;
 	}
 
+	function call_event_sess($_event,$_params=[],$priority=null)
+	{
+		
+		if(!isset($_SESSION['events']))
+		{
+			$_SESSION['events']=[];
+		}
+		$_SESSION['events'][]=['event'=>$_event,'params'=>$_params,'priority'=>$priority];
+	}
+	
+	function exe_sess_events()
+	{
+	//	unset($_SESSION['events']);
+		if(isset($_SESSION['events']))
+		{
+			foreach ($_SESSION['events'] as $_ev)
+			{
+				$this->call_event($_ev['event'],$_ev['params'],$_ev['priority']);
+			}
+			unset($_SESSION['events']);
+		}
+	}
+	
 	function event_function_name($ev_name)
 	{
 		return strtr($ev_name,".","_");
