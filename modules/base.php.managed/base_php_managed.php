@@ -8,7 +8,9 @@ class Module extends Core\Module
 		{
 			$struct = [];
 			
-			$_params['code']=preg_replace("/\/*.*\*\//gs", "", $_params['code']);
+			$_params['code']=preg_replace("/\/\*.+\*\//s", "", $_params['code']);
+			
+			$_params['code']=preg_replace("/\/\/.*$/s", "", $_params['code']);
 			
 			
 			$matches_cycles=[];
@@ -24,6 +26,11 @@ class Module extends Core\Module
 					unset($matches_cycles[1][$i]);
 					unset($matches_cycles[2][$i]);
 				}
+			}
+			
+			foreach($matches_cycles[0] as $i => $_code_part)
+			{
+				
 			}
 			
 			print_r($matches_cycles);
@@ -54,5 +61,36 @@ class Module extends Core\Module
 			
 			return $_code_regions;
 		}
-	}	
+	}
+	
+	class mp_simply_code
+	{
+		VAR $code;
+		
+		function __construct($_code)
+		{
+			$this->code = $_code;
+		} 
+	
+	}
+	
+	class mp_uncode	// не 
+	{
+		VAR $code;
+		
+		function __construct($_code)
+		{
+			$this->code = $_code;
+		}
+	}
+	
+	class mp_cycle
+	{
+		VAR $cycle_type = "";
+		function __construct()
+		{
+			
+		}
+	}
 }
+
