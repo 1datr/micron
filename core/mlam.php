@@ -121,13 +121,26 @@ class MLAM {
 		return null;
 	}
 	// обращение прямое к функции модуля
-	function call_module($modname,$method,&$params)
+	public function call_module($modname,$method,&$params)
 	{
-		if(isset($this->_SETTINGS[$modname]))
+		if(isset($this->_MODULES_OBJS[$modname]))
 		{
-			return $this->_SETTINGS[$modname]->$method($params);
+			return $this->_MODULES_OBJS[$modname]->$method($params);
 		}
 		else 
+		{
+			$this->err_log("Module not exists");
+			return null;
+		}
+	}
+	
+	public function _call_module($modname,$method,$params)
+	{
+		if(isset($this->_MODULES_OBJS[$modname]))
+		{
+			return $this->_MODULES_OBJS[$modname]->$method($params);
+		}
+		else
 		{
 			$this->err_log("Module not exists");
 			return null;

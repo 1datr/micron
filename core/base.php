@@ -3,7 +3,7 @@ namespace Core {
 
 	class Module {
 			
-		var $ME=NULL;
+		var $MLAM=NULL;
 		
 		VAR $_MOD_NAME;
 		
@@ -33,17 +33,17 @@ namespace Core {
 		public function set_ME($_ME)
 		{
 			
-			$this->ME = $_ME;
+			$this->MLAM = $_ME;
 		}
 		
 		public function call_event($_ev,$_params,$priorities=null)
 		{
-			$this->ME->call_event($this->_MOD_NAME.".".$_ev,$_params,$priorities);
+			$this->MLAM->call_event($this->_MOD_NAME.".".$_ev,$_params,$priorities);
 		}
 		
 		public function call_event_sess($_ev,$_params,$priorities=null)
 		{
-			$this->ME->call_event_sess($this->_MOD_NAME.".".$_ev,$_params,$priorities);
+			$this->MLAM->call_event_sess($this->_MOD_NAME.".".$_ev,$_params,$priorities);
 		}
 		
 		public function install()
