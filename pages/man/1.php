@@ -2,7 +2,7 @@
 // fruits array
 $fruits = ['pie','apple','cherry'];
 ?>
-<h5>foreach($fruits as $fr)</h5>
+<h5>foreach(@@){}</h5>
 <ul>		
 <?php
 /* +=+=+=+

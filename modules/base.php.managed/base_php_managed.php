@@ -6,34 +6,40 @@ class Module extends Core\Module
 	{		
 		public function compile($_params)
 		{
-			$struct = [];
-			
-			$_params['code']=preg_replace("/\/\*.+\*\//s", "", $_params['code']);
-			
-			$_params['code']=preg_replace("/\/\/.*$/s", "", $_params['code']);
-			
-			
-			$matches_cycles=[];
-			preg_match_all("/(foreach|for|while)\((.+)\)/Uis",$_params['code'],$matches_cycles, PREG_OFFSET_CAPTURE );
-			//print_r($matches_cycles);
-			// лишь те форичи где php-код, а не html
-			$_code_regions = $this->get_code_points($_params['code']);
-			foreach($matches_cycles[0] as $i => $_code_part)
+			$code_points = $this->get_code_points($_params['code']);
+			$tree = $this->MLAM->_call_module('treep','compile',[
+					'code'=>$_params['code'],
+					'nstart'=>'/((while|for|foreach|if|else|elseif|switch)\((.+)\).*$\s*\{)|((while|for|foreach|if|else|elseif|switch)\((.+)\).*\s*\{)/',
+					'nend'=>'/\}/',
+					'onmapready'=>function(&$pbuf) use($code_points)
+					{
+						foreach($pbuf as $idx => $buf)
+						{
+							$in_code=false;
+							foreach ($code_points as $p)
+							{
+								if(($p['start']<=$idx)&&($idx<=$p['end']))
+								{
+									$in_code=true;
+									break;
+								}
+							}
+							if(!$in_code)
+							{
+								unset($pbuf[$idx]);
+							}
+						}
+					}
+					
+			]);
+			if($tree==null)
 			{
-				if(!$this->in_code($_code_part[1],$_code_regions))
-				{
-					unset($matches_cycles[0][$i]);
-					unset($matches_cycles[1][$i]);
-					unset($matches_cycles[2][$i]);
-				}
+				echo "<h3>".$this->MLAM->_call_module('treep','get_err_text',[])."</h3>";
 			}
-			
-			foreach($matches_cycles[0] as $i => $_code_part)
+			else
 			{
-				
+				print_r($tree);
 			}
-			
-			print_r($matches_cycles);
 		}
 		
 		function in_code($str_no, $code_regions)

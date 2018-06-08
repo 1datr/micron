@@ -36,11 +36,12 @@ class Module extends Core\Module
 			//print_r($n_ends[0]);
 			if(count($n_ends[0])>0)
 			{
+			/*
 				if(count($n_ends[0])!=count($n_starts[0]))
 				{
 					$this->ERROR_NO = 1;
 					return null;
-				}
+				}*/
 				
 				if($n_ends[0][0][1]<$n_starts[0][0][1])
 				{
@@ -76,8 +77,14 @@ class Module extends Core\Module
 						
 					$pointbuf[$n_ends[0][$idx][1]]=$point;
 				}
-				
+								
 				ksort($pointbuf);
+				
+				if(isset($params['onmapready']))
+				{
+					$params['onmapready']($pointbuf);
+				}
+							
 				
 				// основной цикл формирования дерева 
 				$curr_node = $root;
@@ -111,7 +118,14 @@ class Module extends Core\Module
 						
 						$curr_node->_END_TAG_REGEXP_RESULT = $point['buf'];
 						
-						$curr_node = $curr_node->_PARENT;
+						// запустить событие при окончании создания узла
+						if(isset($params['onnoderady']))
+						{
+							$params['onnoderady']($curr_node);
+						}
+						
+						$curr_node = $curr_node->_PARENT;						
+						
 					}
 				}
 				
