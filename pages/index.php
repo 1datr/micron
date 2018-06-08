@@ -20,7 +20,8 @@ xxx
 xxx
 		{#foreach(arr_x as idx => x)
 
-		#}";
+		#}
+ddd";
 $tree = $this->MLAM->_call_module('treep','compile',[
 		'code'=>$_code,
 		'nstart'=>'/\{#([[:alnum:]]+)(\s+([[:alnum:]]+)=\\"([[:alnum:]]+)\\")*/s',
@@ -30,5 +31,16 @@ if($tree==null)
 {
 	echo "<h3>".$this->MLAM->_call_module('treep','get_err_text',[])."</h3>";
 }
-print_r($tree);
+
+$tree->walk(function($item)
+{
+	if(is_string($item))
+		echo $item;
+	else 
+	{
+		print_r($item->_START_TAG_REGEXP_RESULT);
+		print_r($item->_END_TAG_REGEXP_RESULT);
+	}
+})
+//print_r($tree);
 ?>

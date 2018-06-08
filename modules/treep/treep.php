@@ -52,87 +52,70 @@ class Module extends Core\Module
 				$submap = [];
 				$idx_start = 0;
 				$idx_end =0;
-				$curr_pos=0;
+				$pos=0;
 				
-				// основной цикл формирования дерева
-				while($idx_start<count($n_starts))// ($n_starts[0] as $_node_start)
+				$pointbuf=[];
+				for($idx=0;$idx<count($n_starts[0]);$idx++)
 				{
-					if($idx_start==0)
+					$point=['buf'=>[],'type'=>'open'];
+					foreach ($n_starts as $nst)
 					{
-						//строка перед тегом
-						$substr = substr($params['code'],$pos,$n_starts[0][$idx_start][1]-$pos);
-						$pos = $n_starts[0][$idx_start][1]+strlen($n_starts[0][$idx_start][0]);
+						$point['buf'][]=$nst[$idx][0];
+					}
+					
+					$pointbuf[$n_starts[0][$idx][1]]=$point;
+				}
+				
+				for($idx=0;$idx<count($n_ends[0]);$idx++)
+				{
+					$point=['buf'=>[],'type'=>'closed'];
+					foreach ($n_ends as $nend)
+					{
+						$point['buf'][]=$nend[$idx][0];
+					}
+						
+					$pointbuf[$n_ends[0][$idx][1]]=$point;
+				}
+				
+				ksort($pointbuf);
+				
+				// основной цикл формирования дерева 
+				$curr_node = $root;
+				$last_pos = 0;
+				foreach ($pointbuf as $pos => $point)
+				{
+					if($point['type']=='open')
+					{
+						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
 						$curr_node->add_item($substr);
 						
-						$newnode = new tnode();
-						$newnode->_PARENT = $curr_node;
-						$newnode->_POS_STRAT = $n_starts[0][$idx_start][1];
-						$newnode->_POS_START_END = $pos;
+						$newtag = new tnode();
+						$newtag->_POS_STRAT = $pos;
+						$newtag->_POS_START_END = $pos+strlen($point['buf'][0]);
+						$last_pos = $newtag->_POS_START_END; 
+						$newtag->_START_TAG_REGEXP_RESULT = $point['buf'];
+						$newtag->_PARENT = $curr_node;
+						$curr_node->add_item($newtag);
 						
-						// расставляем регулярные выражения начала
-						foreach ($n_starts as $start)
-						{
-							$newnode->_START_TAG_REGEXP_RESULT[]=$start[$idx_start][0];
-						}
-						
-						$curr_node->add_item($newnode);						
-						
-						$curr_node = $newnode;
-						
-						$idx_start++;
+						$curr_node = $newtag;
 					}
-					else 
+					elseif($point['type']=='closed')
 					{
-						if($n_ends[0][$idx_end][1]< $n_starts[0][$idx_start][1] ) // пришел конец тега 
-						{
-							//строка перед тегом
-							$substr = substr($params['code'],$pos,$n_ends[0][$idx_end][1]-$pos);
-							
-							$pos = $n_ends[0][$idx_end][1]+strlen($n_ends[0][$idx_end][0]);
-							$curr_node->add_item($substr);
-							
-							$curr_node->_POS_END = $n_ends[0][$idx_end][1];
-							$curr_node->_POS_END_END = $pos;
-							
-							foreach ($n_ends as $end)
-							{
-								$curr_node->_END_TAG_REGEXP_RESULT[]=$end[$idx_end][0];
-								//$curr_node->_END_TAG_REGEXP_RESULT[]=$n_ends[0][$idx_end][0];
-							}							
-							
-							$curr_node = $curr_node->_PARENT;
-							$idx_end++;
-						}
-						else		// пришел новый тег 
-						{
-							//строка перед тегом
-							$substr = substr($params['code'],$pos,$n_starts[0][$idx_start][1]-$pos);
-							$curr_node->add_item($substr);
-							$pos = $n_starts[0][$idx_start][1]+strlen($n_starts[0][$idx_start][0]);
-							
-							$newnode = new tnode();
-							$newnode->_PARENT = $curr_node;
-							$newnode->_POS_STRAT = $n_starts[0][$idx_start][1];
-							$newnode->_POS_START_END = $pos;
-							
-							foreach ($n_starts as $start)
-							{
-								$newnode->_START_TAG_REGEXP_RESULT[]=$start[$idx_start][0];
-							}
-							
-							$newnode->_POS_START_END = $newnode->_POS_STRAT+strlen($n_starts[0][$idx_start][0]);
-							$curr_node->add_item($newnode);
-							
-							$curr_node = $newnode;
-							
-							$idx_start++;
-						}
+						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
+						$curr_node->add_item($substr);
+						
+						$curr_node->_POS_END = $pos;
+						$curr_node->_POS_END_END = $pos+strlen($point['buf'][0]);
+						
+						$last_pos = $curr_node->_POS_END_END;
+						
+						$curr_node->_END_TAG_REGEXP_RESULT = $point['buf'];
+						
+						$curr_node = $curr_node->_PARENT;
 					}
-					
 				}
-					
 				
-				$substr = substr($params['code'],$pos,strlen($params['code'])-$pos);
+				$substr = substr($params['code'],$last_pos,strlen($params['code'])-$last_pos);
 					
 				$pos = strlen($params['code']);
 				$root->add_item($substr);
@@ -194,6 +177,30 @@ class Module extends Core\Module
 		function close()
 		{
 			
+		}
+		
+		function walk($onwalk_callback)
+		{
+			$onwalk_callback($this);
+			foreach($this->_ITEMS as $idx => $item)
+			{
+				if(is_object($item))
+				{
+					if(get_class($item)==get_class($this))
+					{
+						$item->walk($onwalk_callback);
+					}
+					else
+					{
+						$onwalk_callback($item);
+					}
+				}
+				else 
+				{
+					$onwalk_callback($item);
+				}
+				
+			}
 		}
 		
 		
