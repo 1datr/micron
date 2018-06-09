@@ -1,4 +1,10 @@
 <?php
+/*
+ *   ”ниверсальный древовидный парсер
+ * 
+ * 
+ * 
+ * */
 namespace modules\treep{
 use Core;
 
@@ -54,8 +60,48 @@ class Module extends Core\Module
 			}
 		}
 		
+		private function get_shields_areas($params)
+		{
+			$shields = [];
+			if(isset($params['shields']))
+			{				
+				if(is_array($params['shields']))  
+				{
+					foreach($params['shields'] as $shidx => $shld)
+					{
+						$_shields=[];
+						$ptrn = '/'.$shld[0].'(.*)'.$shld[1].'/sm';
+						preg_match_all($ptrn, $params['code'],$_shields, PREG_OFFSET_CAPTURE);
+						foreach ($_shields as $shld)
+						{
+							$shields[]=['start'=>$shld[0][1],'end'=>$shld[0][1]+strlen($shld[0][0])];
+						}
+					}
+				}
+			}			
+			return $shields;
+		}
+		
+		private function delete_shilds($params,&$str)
+		{
+			if(isset($params['shields']))
+			{
+				if(is_array($params['shields']))
+				{
+					foreach($params['shields'] as $shidx => $shld)
+					{
+						$_shields=[];
+						$ptrn = '/'.$shld[0].'(.*)'.$shld[1].'/sm';
+						$str = preg_replace($ptrn, '$1', $str);					
+					}
+				}
+			}
+		}
+		
 		public function compile($params)
 		{
+			def_options(['comments'=>['#\/\*.*\*\/#s','#\/\/.*$#m']],$params);
+			
 			$this->clear_comments($params);
 			
 			$n_starts=[];
@@ -105,8 +151,24 @@ class Module extends Core\Module
 						
 					$pointbuf[$n_ends[0][$idx][1]]=$point;
 				}
+				
+				// экранированные регионы
+				$shilds = $this->get_shields_areas($params);
+				
+				// убираем точки, оказавшиес€ в экранированных регионах
+				foreach($pointbuf as $str => $info)
+				{
+					foreach($shilds as $shld)
+					{
+						if(($shld['start']<=$str)&&($str<=$shld['end']))	// попадает в экранируемый регион 
+						{
+							unset($pointbuf[$str]);	// удал€ем и переходим к следующей
+							break;
+						}
+					}
+				}								
 								
-				ksort($pointbuf);
+				ksort($pointbuf);									
 				
 				if(isset($params['onmapready']))
 				{
@@ -130,6 +192,7 @@ class Module extends Core\Module
 					if($point['type']=='open')
 					{
 						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
+						$this->delete_shilds($params,$substr);
 						$curr_node->add_item($substr);
 						
 						$newtag = new tnode();
@@ -145,6 +208,7 @@ class Module extends Core\Module
 					elseif($point['type']=='closed')
 					{
 						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
+						$this->delete_shilds($params,$substr);
 						$curr_node->add_item($substr);
 						
 						$curr_node->_POS_END = $pos;
@@ -166,6 +230,7 @@ class Module extends Core\Module
 				}
 				
 				$substr = substr($params['code'],$last_pos,strlen($params['code'])-$last_pos);
+				$this->delete_shilds($params,$substr);
 					
 				$pos = strlen($params['code']);
 				$root->add_item($substr);

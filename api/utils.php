@@ -139,6 +139,7 @@ function _array_diff($arrA,$arrB)
 	return $newarray;
 }
 
+// устанавливает опции по умолчанию $defs дл€ массива $opt_array
 function def_options($defs,&$opt_array)
 {
 	foreach ($defs as $defkey => $defval)

@@ -10,7 +10,11 @@ $_code = file_get_contents('./pages/man/1.php');
 
 $_code = "
 /* {#rz
-		*/		
+		*/	
+		{@
+		{#reef  #}
+		@}
+		
 xxx		
 		{#if c=\"xx\" (x==0)
 		{#then 
@@ -30,7 +34,8 @@ $tree = $this->MLAM->_call_module('treep','compile',[
 		'code'=>$_code,
 		'nstart'=>'/\{\#([[:alnum:]]+)/',
 		'nend'=>'/\#\}/',
-		'comments'=>['#\/\*.*\*\/#s','#\/\/.*$#'],
+		'comments'=>['#\/\*.*\*\/#s','#\/\/.*$#m'],
+		'shields'=>[['{@','@}']],
 		/*
 		'nstart'=>'/((while|for|foreach|if|else|elseif|switch)\((.+)\).*$\s*\{)|((while|for|foreach|if|else|elseif|switch)\((.+)\).*\s*\{)/',
 		'nend'=>'/\}/'*/		
