@@ -22,8 +22,42 @@ class Module extends Core\Module
 			return "";
 		}
 		
+		public function calc_open_close($buf,&$count_open,&$count_closed)
+		{
+			$count_open=0;
+			$count_closed=0;
+			foreach($buf as $str => $point)
+			{
+				if($point['type']=='open')
+				{
+					$count_open++;
+				}
+				elseif($point['type']=='closed')
+				{
+					$count_closed++;
+				}
+			}
+		}
+		
+		public function clear_comments(&$params)
+		{
+			if(is_array($params['comments']))
+			{
+				foreach ($params['comments'] as $idx => $_str)
+				{
+					$params['code'] = preg_replace($_str, "", $params['code']);
+				}
+			}
+			elseif(is_string($params['comments'])) 
+			{
+				$params['code'] = preg_replace($params['comments'], "", $params['code']);
+			}
+		}
+		
 		public function compile($params)
 		{
+			$this->clear_comments($params);
+			
 			$n_starts=[];
 			preg_match_all($params['nstart'], $params['code'],$n_starts, PREG_OFFSET_CAPTURE);
 			
@@ -36,13 +70,7 @@ class Module extends Core\Module
 			//print_r($n_ends[0]);
 			if(count($n_ends[0])>0)
 			{
-			/*
-				if(count($n_ends[0])!=count($n_starts[0]))
-				{
-					$this->ERROR_NO = 1;
-					return null;
-				}*/
-				
+							
 				if($n_ends[0][0][1]<$n_starts[0][0][1])
 				{
 					$this->ERROR_NO = 1;
@@ -84,7 +112,15 @@ class Module extends Core\Module
 				{
 					$params['onmapready']($pointbuf);
 				}
-							
+						
+				$count_open = 0;
+				$count_closed = 0;
+				$this->calc_open_close($pointbuf,$count_open,$count_closed);
+				if($count_closed!=$count_open)
+				{
+					$this->ERROR_NO=1;
+					return null;
+				}
 				
 				// основной цикл формирования дерева 
 				$curr_node = $root;
