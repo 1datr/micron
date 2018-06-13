@@ -1,9 +1,33 @@
 <?php
 /*
- *   Универсальный древовидный парсер
- * 
- * 
- * 
+    Универсальный древовидный парсер
+ 
+  	Преобразует текст типа
+ /# {#rz
+		#/	
+		{@
+		{#reef  #}
+		@}
+		
+xxx		
+		{#if c=\"xx\" (x==0)
+		{#then 
+				x=x+1;
+			#}
+		{#else 
+				x=x+2;
+			#}
+// #}		
+		#}
+xxx
+		{#foreach(arr_x as idx => x)
+
+		#}
+ddd 	
+  	
+ в древовидную структуру из tnode исходя из соглашения о том как выглядит начальный и конечный тэг, комментарии и экранирующие последовательности, где текст 
+ воспринимается как единый текст, несмотря на возможное наличие в нем начальных либо конечных тегов. 
+  
  * */
 namespace modules\treep{
 use Core;
@@ -12,13 +36,15 @@ class Module extends Core\Module
 	{		
 		
 		VAR $ERROR_NO = 0;
-		var $ERROR_TEXTS = [1=>'Bad tree'];
+		var $ERROR_TEXTS = [1=>'Parse error'];
 		
+		// номер ошибки после последней операции парсинга
 		public function get_error()
 		{
 			return $this->ERROR_NO;
 		}
 		
+		// текст последней ошибки
 		public function get_err_text()
 		{
 			if(isset($this->ERROR_TEXTS[$this->ERROR_NO]))
@@ -28,7 +54,7 @@ class Module extends Core\Module
 			return "";
 		}
 		
-		public function calc_open_close($buf,&$count_open,&$count_closed)
+		private function calc_open_close($buf,&$count_open,&$count_closed)
 		{
 			$count_open=0;
 			$count_closed=0;
@@ -45,7 +71,7 @@ class Module extends Core\Module
 			}
 		}
 		
-		public function clear_comments(&$params)
+		private function clear_comments(&$params)
 		{
 			if(is_array($params['comments']))
 			{
@@ -97,7 +123,19 @@ class Module extends Core\Module
 				}
 			}
 		}
-		
+		/* откомпилировать в дерево
+		 $params - ассоциативный массив параметров со строковыми ключами 		 
+		 	Параметры :
+		 code - непосредственно строка кода
+		 nstart - регулярное выражение стартовых токенов
+		 nend  - регулярное выражение конечных токенов 
+		 comments - регулярное выращение блоков комментариев (однострочных и многострочных) строкалибо массив строк
+		 shields - массив экранирующих последовательностей [рег. выр. начало, рег. выр. конец]
+		 	Параметры-события :
+		 onmapready($pointbuf) - после построения карты  
+		 onnoderady($curr_node) - после построения узла
+		 	  
+		 * */
 		public function compile($params)
 		{
 			def_options(['comments'=>['#\/\*.*\*\/#s','#\/\/.*$#m']],$params);
@@ -245,18 +283,13 @@ class Module extends Core\Module
 				$root->add_item($params['code']);
 				return $root;
 			}
-			/*$order_buff=[]
-			for($i=0;$i<count($n_starts[0]);$i++)
-			{
-				
-			}
-			*/		
-			
-			
+						
 		}
 	
 	}	
-	
+/*
+Элемент дерева, строимого парсером
+*/
 	class tnode
 	{
 		VAR $_ITEMS=[];
