@@ -279,7 +279,7 @@ class Module extends Core\Module
 				$substr_node = new tn_text($substr);
 					
 				$pos = strlen($params['code']);
-				$root->add_item($substr_node);
+				$root->add_item($substr_node); // добавить айтем
 				
 				$root->_POS_END = strlen($params['code']);
 				$root->_POS_END_END = strlen($params['code']);
