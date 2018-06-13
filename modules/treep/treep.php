@@ -326,7 +326,7 @@ class Module extends Core\Module
 		{
 			
 		}
-		
+		// ходим по дереву, выполн€€ на каждом узле процедуру вида function($node){}
 		function walk($onwalk_callback)
 		{
 			$onwalk_callback($this);
