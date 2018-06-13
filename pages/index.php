@@ -48,8 +48,8 @@ else
 {
 	$tree->walk(function($item)
 	{
-		if(is_string($item))
-			echo $item;
+		if($item->is_text())
+			echo $item->text();
 		else 
 		{
 			print_r($item->_START_TAG_REGEXP_RESULT);

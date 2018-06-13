@@ -150,7 +150,7 @@ class Module extends Core\Module
 			
 			//print_r($n_starts);
 			
-			$root = new tnode(true);
+			$root = new tn_object(true);
 			//print_r($n_ends[0]);
 			if(count($n_ends[0])>0)
 			{
@@ -231,9 +231,12 @@ class Module extends Core\Module
 					{
 						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
 						$this->delete_shilds($params,$substr);
-						$curr_node->add_item($substr);
 						
-						$newtag = new tnode();
+						$substr_node = new tn_text($substr);
+						
+						$curr_node->add_item($substr_node);
+						
+						$newtag = new tn_object();
 						$newtag->_POS_STRAT = $pos;
 						$newtag->_POS_START_END = $pos+strlen($point['buf'][0]);
 						$last_pos = $newtag->_POS_START_END; 
@@ -247,7 +250,10 @@ class Module extends Core\Module
 					{
 						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
 						$this->delete_shilds($params,$substr);
-						$curr_node->add_item($substr);
+						
+						$substr_node = new tn_text($substr);
+						
+						$curr_node->add_item($substr_node);
 						
 						$curr_node->_POS_END = $pos;
 						$curr_node->_POS_END_END = $pos+strlen($point['buf'][0]);
@@ -269,9 +275,11 @@ class Module extends Core\Module
 				
 				$substr = substr($params['code'],$last_pos,strlen($params['code'])-$last_pos);
 				$this->delete_shilds($params,$substr);
+				
+				$substr_node = new tn_text($substr);
 					
 				$pos = strlen($params['code']);
-				$root->add_item($substr);
+				$root->add_item($substr_node);
 				
 				$root->_POS_END = strlen($params['code']);
 				$root->_POS_END_END = strlen($params['code']);
@@ -287,11 +295,78 @@ class Module extends Core\Module
 		}
 	
 	}	
+	
+/* Иерархический нумератор */	
+	class HNnumerator{
+		VAR $buf=[];
+		VAR $idx=0;
+		VAR $delimeter='.';
+		
+		function __construct($del='.')
+		{
+			$this->buf[]=[1];
+			$this->delimeter;
+		}
+		
+		function inc()
+		{
+			$this->buf[$this->idx]++;
+		}
+		
+		function up()
+		{
+			if($this->idx>=0)
+			{
+				$this->buf[$this->idx];
+				$this->idx--;
+			}
+		}
+		
+		function down()
+		{
+			$this->buf[]=1;
+			$this->idx++;
+		}
+		
+		function getText()
+		{
+			return implode($this->delimeter,$this->buf);
+		}
+	}
 /*
 Элемент дерева, строимого парсером
 */
-	class tnode
+	class treep_node 
 	{
+		VAR $number=NULL;
+		VAR $_IS_TEXT=FALSE;
+		
+		function is_text()
+		{
+			return $this->_IS_TEXT;
+		}
+	}
+	
+	class tn_text extends treep_node
+	{
+		VAR $_TEXT;
+		
+		function __construct($_text_)
+		{
+			$this->_TEXT=$_text_;
+			$this->_IS_TEXT = true;
+		}
+		
+		function text()
+		{
+			return $this->_TEXT;
+		}
+					
+	}
+	
+	
+	class tn_object extends treep_node
+	{	
 		VAR $_ITEMS=[];
 		VAR $_START_TAG_REGEXP_RESULT=[];
 		VAR $_END_TAG_REGEXP_RESULT=[];
