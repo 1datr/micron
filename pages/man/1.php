@@ -1,6 +1,7 @@
 <?php
 // fruits array
 $fruits = ['pie','apple','cherry'];
+/* %% */$x=9; /* ## */
 ?>
 <h5>foreach(@@){}</h5>
 <ul>		
@@ -13,9 +14,19 @@ foreach($fruits as $fruit)
 	<?=$fruit?>
 		<ul>
 		<?php
+		/*
+		55556
+		*/
 		for($i=0;$i<5;$i++)
 		{
-			echo "<li>$i</li>";
+			if($i<4)
+			{
+				echo "<li>$i</li>";
+			}
+			else 
+			{
+				echo "<li>$i ++</li>";
+			}
 		}
 		?>
 		</ul>

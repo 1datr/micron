@@ -7,10 +7,10 @@ $_code = file_get_contents('./pages/man/1.php');
 
 //$this->MLAM->_call_module('base.modutil','create_module',['modname'=>'treep']);
 //$this->MLAM->_call_module('base.php.managed','compile',['code'=>$_code]);
-
+/*
 $_code = "
-/* {#rz
-		*/	
+/# {#rz
+		#/	
 		{@
 		{#reef  #}
 		@}
@@ -29,16 +29,18 @@ xxx
 		{#foreach(arr_x as idx => x)
 
 		#}
-ddd";
+ddd";*/
 $tree = $this->MLAM->_call_module('treep','compile',[
 		'code'=>$_code,
-		'nstart'=>'/\{\#([[:alnum:]]+)/',
+	/*	'nstart'=>'/\{\#([[:alnum:]]+)/',
 		'nend'=>'/\#\}/',
-		'comments'=>['#\/\*.*\*\/#s','#\/\/.*$#m'],
-		'shields'=>[['{@','@}']],
-		/*
-		'nstart'=>'/((while|for|foreach|if|else|elseif|switch)\((.+)\).*$\s*\{)|((while|for|foreach|if|else|elseif|switch)\((.+)\).*\s*\{)/',
-		'nend'=>'/\}/'*/		
+		'comments'=>['#\/\#.*\#\/#s','#\/\/.*$#m'],
+		'shields'=>[['{@','@}']],*/		
+		'nstart'=>'/((while|for|foreach|if|else|elseif|switch|case)\((.+)\).*$\s*\{)|((while|for|foreach|if|else|elseif|switch)\((.+)\).*\s*\{)/',
+		'nend'=>'/\}/',
+		'comments'=>['#\/\*.*\*\/#Us','#\/\/.*$#m'],
+		'shields'=>[['\?>','<\?php','clear'=>false],['\?>','<\?=','clear'=>false],['\?>','$','clear'=>false]],
+		
 ]);
 if($tree==null)
 {

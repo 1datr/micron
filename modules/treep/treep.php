@@ -93,18 +93,53 @@ class Module extends Core\Module
 			{				
 				if(is_array($params['shields']))  
 				{
+					$ptrn='/';
 					foreach($params['shields'] as $shidx => $shld)
-					{
+					{						
+						$ptrn = '/'.$shld[0].'(.*)'.$shld[1].'/Us';
+					
 						$_shields=[];
-						$ptrn = '/'.$shld[0].'(.*)'.$shld[1].'/sm';
 						preg_match_all($ptrn, $params['code'],$_shields, PREG_OFFSET_CAPTURE);
-						foreach ($_shields as $shld)
+						foreach ($_shields[0] as $_shld)
 						{
-							$shields[]=['start'=>$shld[0][1],'end'=>$shld[0][1]+strlen($shld[0][0])];
+							$_code = $_shld[0];
+							
+							// проверяем не содержит ли текущий код в себе какой-нибудь из уже существующих
+							/*
+							foreach ($shields as $shld_item)
+							{
+								
+							}*/
+							
+							$shields[]=['start'=>$_shld[1],
+									'end'=>$_shld[1]+strlen($_shld[0]),
+									'code'=>$_code
+							];
 						}
-					}
+					}																		
 				}
 			}			
+			
+			// фильтруем регионы	
+			$idx_to_unset=[];
+			foreach ($shields as $idx1 => $shld1)
+			{
+				foreach ($shields as $idx2 => $shld2)
+				{
+					if( ($idx1!=$idx2)&&(!in_array($idx1, $idx_to_unset)) )
+					{
+						if(($shld1['start']<=$shld2['start'])&&($shld2['end']<=$shld1['end']))
+						{
+							$idx_to_unset[]=$idx1; 
+							break;
+						}
+					}
+				}	
+			}
+			foreach ($idx_to_unset as $_idx)
+			{
+				unset($shields[$_idx]);
+			}
 			return $shields;
 		}
 		
@@ -112,13 +147,17 @@ class Module extends Core\Module
 		{
 			if(isset($params['shields']))
 			{
-				if(is_array($params['shields']))
-				{
+				if(is_array($params['shields']))							
+				{					
 					foreach($params['shields'] as $shidx => $shld)
 					{
-						$_shields=[];
-						$ptrn = '/'.$shld[0].'(.*)'.$shld[1].'/sm';
-						$str = preg_replace($ptrn, '$1', $str);					
+						def_options(['clear'=>true], $shld);
+						if($shld['clear'])
+						{
+							$_shields=[];
+							$ptrn = '/'.$shld[0].'(.*)'.$shld[1].'/sm';
+							$str = preg_replace($ptrn, '$1', $str);
+						}
 					}
 				}
 			}
@@ -194,17 +233,22 @@ class Module extends Core\Module
 				$shilds = $this->get_shields_areas($params);
 				
 				// убираем точки, оказавшиеся в экранированных регионах
+				$to_delete=[];
 				foreach($pointbuf as $str => $info)
 				{
 					foreach($shilds as $shld)
 					{
 						if(($shld['start']<=$str)&&($str<=$shld['end']))	// попадает в экранируемый регион 
 						{
-							unset($pointbuf[$str]);	// удаляем и переходим к следующей
+							$to_delete[]=$str;	// удаляем и переходим к следующей
 							break;
 						}
 					}
-				}								
+				}							
+				foreach ($to_delete as $_str)
+				{
+					unset($pointbuf[$_str]);
+				}
 								
 				ksort($pointbuf);									
 				
