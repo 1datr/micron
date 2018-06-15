@@ -37,6 +37,7 @@ class Module extends Core\Module
 		
 		VAR $ERROR_NO = 0;
 		var $ERROR_TEXTS = [1=>'Parse error'];
+		VAR $_COMMENTS_MAP=[];
 		
 		// номер ошибки после последней операции парсинга
 		public function get_error()
@@ -70,20 +71,46 @@ class Module extends Core\Module
 				}
 			}
 		}
-		
-		private function clear_comments(&$params)
+		// удалить комментарии из строки если нужно
+		private function clear_comments($params,&$the_str)
 		{
+			if($params['delete_comments'])
+			{
+				if(is_array($params['comments']))
+				{
+					foreach ($params['comments'] as $idx => $_str)
+					{
+						$the_str = preg_replace($_str, "", $the_str);
+					}
+				}
+				elseif(is_string($params['comments'])) 
+				{
+					$the_str = preg_replace($params['comments'], "", $the_str);
+				}
+			}
+		}
+		
+		private function make_comments_map($params)
+		{
+			$_COMMENTS_MAP=[];
 			if(is_array($params['comments']))
 			{
 				foreach ($params['comments'] as $idx => $_str)
 				{
-					$params['code'] = preg_replace($_str, "", $params['code']);
+					$_matches=[];
+					preg_match_all($_str, $params['code'],$_matches, PREG_OFFSET_CAPTURE);
+					
+					//$params['code'] = preg_replace($_str, "", $params['code']);
 				}
 			}
-			elseif(is_string($params['comments'])) 
+			elseif(is_string($params['comments']))
 			{
-				$params['code'] = preg_replace($params['comments'], "", $params['code']);
+				$_matches=[];
+				preg_match_all($_str, $params['code'],$_matches, PREG_OFFSET_CAPTURE);
+				//$params['code'] = preg_replace($params['comments'], "", $params['code']);
 			}
+			
+			return $_COMMENTS_MAP;
 		}
 		
 		private function get_shields_areas($params)
@@ -162,6 +189,27 @@ class Module extends Core\Module
 				}
 			}
 		}
+		
+		private function filter_by_map($map,&$pointbuf)
+		{
+			// убираем точки, оказавшиеся в экранированных регионах
+			$to_delete=[];
+			foreach($pointbuf as $str => $info)
+			{
+				foreach($map as $map_item)
+				{
+					if(($map_item['start']<=$str)&&($str<=$map_item['end']))	// попадает в экранируемый регион
+					{
+						$to_delete[]=$str;	// удаляем и переходим к следующей
+						break;
+					}
+				}
+			}
+			foreach ($to_delete as $_str)
+			{
+				unset($pointbuf[$_str]);
+			}
+		}
 		/* откомпилировать в дерево
 		 $params - ассоциативный массив параметров со строковыми ключами 		 
 		 	Параметры :
@@ -177,9 +225,12 @@ class Module extends Core\Module
 		 * */
 		public function compile($params)
 		{
-			def_options(['comments'=>['#\/\*.*\*\/#s','#\/\/.*$#m']],$params);
+			def_options(['comments'=>['#\/\*.*\*\/#s','#\/\/.*$#m'],
+					'delete_comments'=>true,
+			],$params);
 			
-			$this->clear_comments($params);
+			$comments_map = $this->make_comments_map($params);
+			//$this->clear_comments($params);
 			
 			$n_starts=[];
 			preg_match_all($params['nstart'], $params['code'],$n_starts, PREG_OFFSET_CAPTURE);
@@ -190,6 +241,9 @@ class Module extends Core\Module
 			//print_r($n_starts);
 			
 			$root = new tn_object(true);
+			$numerator = new HNnumerator();
+			$root->number = $numerator->getText();
+			$root->numerator_obj = $numerator;
 			//print_r($n_ends[0]);
 			if(count($n_ends[0])>0)
 			{
@@ -234,25 +288,9 @@ class Module extends Core\Module
 				
 				ksort($pointbuf);
 				// убираем точки, оказавшиеся в экранированных регионах
-				$to_delete=[];
-				foreach($pointbuf as $str => $info)
-				{
-					foreach($shilds as $shld)
-					{
-						if(($shld['start']<=$str)&&($str<=$shld['end']))	// попадает в экранируемый регион 
-						{
-							$to_delete[]=$str;	// удаляем и переходим к следующей
-							break;
-						}
-					}
-				}							
-				foreach ($to_delete as $_str)
-				{
-					unset($pointbuf[$_str]);
-				}
-								
-													
-				
+				$this->filter_by_map($shilds,$pointbuf);
+				$this->filter_by_map($comments_map,$pointbuf);
+																			
 				if(isset($params['onmapready']))
 				{
 					$params['onmapready']($pointbuf);
@@ -270,14 +308,18 @@ class Module extends Core\Module
 				// основной цикл формирования дерева 
 				$curr_node = $root;
 				$last_pos = 0;
+				
 				foreach ($pointbuf as $pos => $point)
 				{
 					if($point['type']=='open')
 					{
 						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
 						$this->delete_shilds($params,$substr);
+						$this->clear_comments($params,$substr);
 						
 						$substr_node = new tn_text($substr);
+						
+						
 						
 						$curr_node->add_item($substr_node);
 						
@@ -287,6 +329,9 @@ class Module extends Core\Module
 						$last_pos = $newtag->_POS_START_END; 
 						$newtag->_START_TAG_REGEXP_RESULT = $point['buf'];
 						$newtag->_PARENT = $curr_node;
+						
+						
+						
 						$curr_node->add_item($newtag);
 						
 						$curr_node = $newtag;
@@ -295,8 +340,10 @@ class Module extends Core\Module
 					{
 						$substr = substr($params['code'],$last_pos,$pos-$last_pos);
 						$this->delete_shilds($params,$substr);
+						$this->clear_comments($params,$substr);
 						
 						$substr_node = new tn_text($substr);
+
 						
 						$curr_node->add_item($substr_node);
 						
@@ -320,6 +367,7 @@ class Module extends Core\Module
 				
 				$substr = substr($params['code'],$last_pos,strlen($params['code'])-$last_pos);
 				$this->delete_shilds($params,$substr);
+				$this->clear_comments($params,$substr);
 				
 				$substr_node = new tn_text($substr);
 					
@@ -347,10 +395,24 @@ class Module extends Core\Module
 		VAR $idx=0;
 		VAR $delimeter='.';
 		
-		function __construct($del='.')
+		function __construct($str='',$del='.')
 		{
-			$this->buf[]=[1];
-			$this->delimeter;
+			$this->delimeter = $del;
+			if(!empty($str))
+			{
+				$this->from_str($str);
+			}
+			else 
+			{
+				$this->buf[]=1;
+				
+			}
+		}
+		
+		private function from_str($str)
+		{
+			$this->buf = explode($this->delimeter, $str);
+			$this->idx = count($this->buf)-1;
 		}
 		
 		function inc()
@@ -362,7 +424,7 @@ class Module extends Core\Module
 		{
 			if($this->idx>=0)
 			{
-				$this->buf[$this->idx];
+				unset($this->buf[$this->idx]);
 				$this->idx--;
 			}
 		}
@@ -377,6 +439,12 @@ class Module extends Core\Module
 		{
 			return implode($this->delimeter,$this->buf);
 		}
+		
+		
+		
+		public function getString(){
+			return $this->getText();
+		}
 	}
 /*
 Элемент дерева, строимого парсером
@@ -384,6 +452,7 @@ class Module extends Core\Module
 	class treep_node 
 	{
 		VAR $number=NULL;
+		VAR $numerator_obj;
 		VAR $_IS_TEXT=FALSE;
 		
 		function is_text()
@@ -391,7 +460,7 @@ class Module extends Core\Module
 			return $this->_IS_TEXT;
 		}
 	}
-	
+	/* текстовый узел */
 	class tn_text extends treep_node
 	{
 		VAR $_TEXT;
@@ -424,6 +493,21 @@ class Module extends Core\Module
 		
 		function add_item($item)
 		{
+			if(count($this->_ITEMS)>0)
+			{
+				$obj_num = clone $this->_ITEMS[count($this->_ITEMS)-1]->numerator_obj;
+				$obj_num->inc();
+			}
+			else 
+			{
+				$obj_num = clone $this->numerator_obj;
+				$obj_num->down();
+				
+			}
+			
+			$item->numerator_obj = $obj_num;
+			$item->number = $obj_num->getText();
+			
 			$this->_ITEMS[]=$item;
 		}
 		

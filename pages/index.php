@@ -6,7 +6,7 @@ $_code = file_get_contents('./pages/man/1.php');
 //$_code = file_get_contents('./pages/man/2.php');
 
 //$this->MLAM->_call_module('base.modutil','create_module',['modname'=>'treep']);
-//$this->MLAM->_call_module('base.php.managed','compile',['code'=>$_code]);
+$res = $this->MLAM->_call_module('base.php.managed','compile',['code'=>$_code]);
 /*
 $_code = "
 /# {#rz
@@ -30,12 +30,13 @@ xxx
 
 		#}
 ddd";*/
+		/*
 $tree = $this->MLAM->_call_module('treep','compile',[
 		'code'=>$_code,
-	/*	'nstart'=>'/\{\#([[:alnum:]]+)/',
+	/#	'nstart'=>'/\{\#([[:alnum:]]+)/',
 		'nend'=>'/\#\}/',
 		'comments'=>['#\/\#.*\#\/#s','#\/\/.*$#m'],
-		'shields'=>[['{@','@}']],*/		
+		'shields'=>[['{@','@}']],#/		
 		'nstart'=>'/((while|for|foreach|if|elseif|switch|case)\((.+)\).*$\s*\{)|((while|for|foreach|if|elseif|switch)\((.+)\).*\s*\{)|(else\s*\{)/',
 		'nend'=>'/\}/',
 		'comments'=>['#\/\*.*\*\/#Us','#\/\/.*$#m'],
@@ -59,7 +60,7 @@ else
 		}
 	});
 }
-
+*/
 	eval("/* ddd */
 \$z=7;
 // dede

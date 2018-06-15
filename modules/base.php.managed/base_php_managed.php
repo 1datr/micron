@@ -9,9 +9,16 @@ class Module extends Core\Module
 			$code_points = $this->get_code_points($_params['code']);
 			$tree = $this->MLAM->_call_module('treep','compile',[
 					'code'=>$_params['code'],
-					'nstart'=>'/((while|for|foreach|if|else|elseif|switch)\((.+)\).*$\s*\{)|((while|for|foreach|if|else|elseif|switch)\((.+)\).*\s*\{)/',
+					'nstart'=>'/((while|for|foreach|if|elseif|switch|try|catch|finally)\((.+)\).*$\s*\{)|((while|for|foreach|if|elseif|switch)\((.+)\).*\s*\{)|(else\s*\{)/',
 					'nend'=>'/\}/',
-					'onmapready'=>function(&$pbuf) use($code_points)
+					'comments'=>['#\/\*.*\*\/#Us','#\/\/.*$#m'],
+					'shields'=>[
+							['\?>','<\?php','clear'=>false],
+							['\?>','<\?=','clear'=>false],
+							['\?>','$','clear'=>false],
+							['\/\*.*CRITICAL\s+STRAT.*\*\/','\/\*.*CRITICAL\s+END.*\*\/','clear'=>false]
+					],
+				/*	'onmapready'=>function(&$pbuf) use($code_points)
 					{
 						foreach($pbuf as $idx => $buf)
 						{
@@ -29,7 +36,7 @@ class Module extends Core\Module
 								unset($pbuf[$idx]);
 							}
 						}
-					}
+					}*/
 					
 			]);
 			if($tree==null)
@@ -38,7 +45,12 @@ class Module extends Core\Module
 			}
 			else
 			{
-				print_r($tree);
+				$tree->walk(function($node)
+					{
+						echo $node->number." | ";
+					}
+				);
+				//print_r($tree);
 			}
 		}
 		

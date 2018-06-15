@@ -2,6 +2,12 @@
 // fruits array
 $fruits = ['pie','apple','cherry'];
 /* %% */$x=9; /* ## */
+/* CRITICAL STRAT */
+for($i=0;$i<6;$i++)
+{
+	echo ">$i";
+}
+/* CRITICAL END */
 ?>
 <h5>foreach(@@){}</h5>
 <ul>		
