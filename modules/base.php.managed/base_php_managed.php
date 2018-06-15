@@ -45,9 +45,14 @@ class Module extends Core\Module
 			}
 			else
 			{
-				$tree->walk(function($node)
+				echo "<h3>PARSING SUCCESSFULL</h3>";
+				// Строим дерево кода
+				$root = new root_node();
+				$curr_node = $root;
+				$tree->walk(function($node) use($curr_node)	
 					{
-						echo $node->number." | ";
+						/*echo $node->number." <br /> ";
+						print_r($node->_START_TAG_REGEXP_RESULT);*/
 					}
 				);
 				//print_r($tree);
@@ -81,30 +86,40 @@ class Module extends Core\Module
 		}
 	}
 	
-	class mp_simply_code
+	class code_node 
 	{
-		VAR $code;
-		
-		function __construct($_code)
+		VAR $number;
+		VAR $numerator_obj;
+		function __construct()
 		{
-			$this->code = $_code;
-		} 
-	
-	}
-	
-	class mp_uncode	// не 
-	{
-		VAR $code;
-		
-		function __construct($_code)
-		{
-			$this->code = $_code;
+				
 		}
 	}
 	
-	class mp_cycle
+	class root_node extends code_node
 	{
-		VAR $cycle_type = "";
+	
+		function __construct()
+		{
+	
+		}
+	}
+	
+	class simple_code extends code_node
+	{
+		VAR $code;
+		
+		function __construct()
+		{
+				
+		}
+	}
+	
+	class operator extends code_node
+	{
+		VAR $op;
+		VAR $argument;
+		
 		function __construct()
 		{
 			
