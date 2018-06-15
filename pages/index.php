@@ -36,7 +36,7 @@ $tree = $this->MLAM->_call_module('treep','compile',[
 		'nend'=>'/\#\}/',
 		'comments'=>['#\/\#.*\#\/#s','#\/\/.*$#m'],
 		'shields'=>[['{@','@}']],*/		
-		'nstart'=>'/((while|for|foreach|if|else|elseif|switch|case)\((.+)\).*$\s*\{)|((while|for|foreach|if|else|elseif|switch)\((.+)\).*\s*\{)/',
+		'nstart'=>'/((while|for|foreach|if|elseif|switch|case)\((.+)\).*$\s*\{)|((while|for|foreach|if|elseif|switch)\((.+)\).*\s*\{)|(else\s*\{)/',
 		'nend'=>'/\}/',
 		'comments'=>['#\/\*.*\*\/#Us','#\/\/.*$#m'],
 		'shields'=>[['\?>','<\?php','clear'=>false],['\?>','<\?=','clear'=>false],['\?>','$','clear'=>false]],

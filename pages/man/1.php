@@ -15,7 +15,7 @@ foreach($fruits as $fruit)
 		<ul>
 		<?php
 		/*
-		55556
+		55556 
 		*/
 		for($i=0;$i<5;$i++)
 		{

@@ -232,6 +232,7 @@ class Module extends Core\Module
 				// экранированные регионы
 				$shilds = $this->get_shields_areas($params);
 				
+				ksort($pointbuf);
 				// убираем точки, оказавшиеся в экранированных регионах
 				$to_delete=[];
 				foreach($pointbuf as $str => $info)
@@ -250,7 +251,7 @@ class Module extends Core\Module
 					unset($pointbuf[$_str]);
 				}
 								
-				ksort($pointbuf);									
+													
 				
 				if(isset($params['onmapready']))
 				{
