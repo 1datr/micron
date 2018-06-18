@@ -9,9 +9,12 @@ namespace Core {
 		
 		VAR $MODE;
 		
-		function __construct($MODE='use')
+		VAR $_PATH;
+		
+		function __construct($_settings=[],$MODE='use')
 		{
 			$this->MODE=$MODE;
+			$this->_PATH = $_settings['path'];
 		}
 		
 		public function onload_basic()
@@ -28,6 +31,16 @@ namespace Core {
 		{
 			return [];
 			
+		}
+		
+		public function AfterLoad()
+		{
+			
+		}
+		
+		protected function load_lib($_lib)
+		{
+			require_once $this->_PATH."/lib/".$_lib.".php";
 		}
 		
 		public function set_ME($_ME)

@@ -5,7 +5,7 @@
 $_code = file_get_contents('./pages/man/1.php');
 //$_code = file_get_contents('./pages/man/2.php');
 
-//$this->MLAM->_call_module('base.modutil','create_module',['modname'=>'treep']);
+//$this->MLAM->_call_module('base.modutil','create_module',['modname'=>'base.tree']);
 $res = $this->MLAM->_call_module('base.php.managed','compile',['code'=>$_code]);
 /*
 $_code = "

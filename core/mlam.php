@@ -6,6 +6,7 @@ class MLAM {
 	var $_MODULES_OBJS=[];
 	var $_SETTINGS=[];
 	var $_MUST_SAVE=[];
+	var $_LOADING_QUEUE=[];
 
 	function load_modules()
 	{
@@ -21,6 +22,27 @@ class MLAM {
 		{							
 				
 			$mod_make_res = $this->load_module($mod);
+		}
+		// событие после загрузки
+		foreach ($this->_MODULES_OBJS as $_modname => $mod_obj)
+		{
+			$this->_MODULES_OBJS[$_modname]->AfterLoad();
+			//$this->_AfterLoad($_modname);
+		}
+	}
+	
+	function _AfterLoad($_modname)
+	{
+		if(!in_array($_modname,$this->_AFTERLOAD_EXECUTED))
+		{
+			$reqs = $this->_MODULES_OBJS[$_modname]->required();
+			foreach ($reqs as $reqmod)
+			{
+				$this->_AfterLoad($reqmod);
+			}
+			$this->_MODULES_OBJS[$_modname]->AfterLoad();
+			
+			$this->_AFTERLOAD_EXECUTED[]=$modname;
 		}
 	}
 
@@ -66,13 +88,13 @@ class MLAM {
 				$mod_obj = $this->unserialize($mod);
 				if($mod_obj===null)
 				{
-					$mod_obj = new $mod_class();
+					$mod_obj = new $mod_class(['path'=> "".dirname($_main_file)]);
 					$mod_obj->onload_basic();
 				}
 			}
 			else
 			{
-				$mod_obj = new $mod_class();
+				$mod_obj = new $mod_class(['path'=> "".dirname($_main_file)]);
 			}
 			$mod_obj->_MOD_NAME = $mod;
 			$mod_obj->set_ME($this);

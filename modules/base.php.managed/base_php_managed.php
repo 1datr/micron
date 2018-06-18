@@ -4,6 +4,11 @@ use Core;
 
 class Module extends Core\Module 
 	{		
+		public function required()
+		{
+			return ['treep'];
+		}
+		
 		public function compile($_params)
 		{
 			$code_points = $this->get_code_points($_params['code']);
