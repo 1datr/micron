@@ -17,15 +17,31 @@ namespace modules\mulgach\hmvc {
 				return ['mulgach'];
 			}
 			
-			public function mulgach_onpage()
+			public function request($req_str)
 			{
 				$req_str = $_REQUEST['r'];
 				$hmvc_req = new HMVCRequest($req_str);
-				print_r($hmvc_req);
+				//print_r($hmvc_req);
 				$_req2 = $hmvc_req->get_alternative();
-				print_r($_req2);
-			//	echo "<h2>MMMN</h2>";
 			}
+			
+			private function get_simply_request($hmv_req)
+			{
+				
+			}
+			
+			public function mulgach_onpage()
+			{
+				$params = [];
+				// параметры текущего запроса
+				$mul_params = $this->MLAM->call_module('mulgach','info',$params);
+				
+				//print_r($mul_params);
+				
+				
+				//print_r($_req2);
+			//	echo "<h2>MMMN</h2>";
+			}					
 	
 		}	
 }

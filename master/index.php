@@ -1,4 +1,4 @@
 <?php
-$_MASTER_MODE=true;
+$_MUL_CFG='__master';
 $_BASEDIR="..";
 include "../core/index.php";
