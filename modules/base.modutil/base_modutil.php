@@ -18,7 +18,7 @@ class Module extends Core\Module
 		
 		function base_html_onbody($params)
 		{
-			$fruits=['apple','pear','cherry','arbuz'];
+		/*	$fruits=['apple','pear','cherry','arbuz'];
 			
 			__foreach($fruits, function($idx,$val)
 			{
@@ -31,7 +31,7 @@ class Module extends Core\Module
 				$this->call_event_sess('on_counted', ['ctr'=>$this->ctr]);
 			}
 			$this->ctr++;
-			$this->ctr%=20;
+			$this->ctr%=20;*/
 		}
 		
 		public function create_module($params)

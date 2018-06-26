@@ -74,9 +74,7 @@ class MLAM {
 				require_once $_main_file;
 			}
 			else 
-				return false;
-			
-			
+				return false;			
 					
 			$mod_class = $this->get_mod_class_name($mod);
 			
@@ -98,6 +96,16 @@ class MLAM {
 			}
 			$mod_obj->_MOD_NAME = $mod;
 			$mod_obj->set_ME($this);
+			// загрузочные настройки
+			if(isset($this->_SETTINGS['mod_params'][$mod]))
+			{
+				$mod_obj->set_load_settings($this->_SETTINGS['mod_params'][$mod]);
+			}
+			else 
+			{
+				$mod_obj->set_load_settings();
+			}
+			
 			$req_modules = $mod_obj->required();
 			foreach($req_modules as $req)
 			{						
