@@ -1,1 +1,1 @@
-a:2:{s:14:"enable_modules";a:3:{i:0;s:6:"base.*";i:1;s:9:"mulgach.*";i:2;s:5:"treep";}s:10:"mod_params";a:1:{s:14:"base.html.page";a:1:{s:6:"active";b:0;}}}
+a:2:{s:14:"enable_modules";a:3:{i:0;s:6:"base.*";i:1;s:9:"mulgach.*";i:2;s:5:"treep";}s:10:"mod_params";a:2:{s:14:"base.html.page";a:1:{s:6:"active";b:0;}s:7:"mulgach";a:1:{s:6:"muldir";s:9:"./mulgach";}}}

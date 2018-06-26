@@ -1,8 +1,9 @@
 <?php
-require_once '/core/base.php';
-require_once '/api/index.php';
-require_once '/core/mlam.php';
+require_once $_BASEDIR.'/core/base.php';
+require_once $_BASEDIR.'/api/index.php';
+require_once $_BASEDIR.'/core/mlam.php';
 use \Core;
+use \Core\MLAM;
 
 $_MLAM = new MLAM();
 $_MLAM->load_modules();

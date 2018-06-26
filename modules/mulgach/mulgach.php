@@ -4,6 +4,10 @@ use Core;
 
 class Module extends Core\Module 
 	{		
+		VAR $_MUL_PATH='';
+		VAR $_CURR_CONF_DIR='';
+		VAR $_CFG_PATH='';
+		VAR $_CONFIG="";
 		
 		function base_html_page_beforepage(&$params)
 		{
@@ -12,10 +16,27 @@ class Module extends Core\Module
 			$params['_page_path'] = "./pages/about.php";*/
 		}
 		
+		public function required()
+		{
+			return ['base.html'];
+		}
+		
+		private function load_mulgach()
+		{
+			$this->_MUL_PATH = $this->_L_SETTINGS['muldir'];
+			$this->_CFG_PATH = url_seg_add($this->_MUL_PATH,'conf.php');	
+			
+			$fp_conf = new Core\FilePair($this->_CFG_PATH);
+			
+			$this->_CONFIG = $fp_conf->get_settings()['CONF'];
+			$this->_CURR_CONF_DIR = url_seg_add($this->_MUL_PATH,"conf",$this->_CONFIG);
+			//print_r($this);
+		} 
+		// при загрузке 
 		function base_html_onbody($params)
 		{
-			$this->call_event('onpage',[]);
-			//echo "<h4>__ MULGAH __</h4>";
+			$this->load_mulgach();
+			$this->call_event('onpage',[]);			
 		}
 		
 		function core_onload()
@@ -28,7 +49,7 @@ class Module extends Core\Module
 		
 		public function AfterLoad()
 		{
-			
+			$this->load_lib('scaff_api/index');
 		
 		}
 
