@@ -1,5 +1,5 @@
 <?php
-namespace modules\mulgach\hmvc\scaffapi{
+namespace modules\mulgach\scaffapi{
 	use Core;
 	
 	class scaff_plugin

@@ -1,10 +1,10 @@
 <?php
-namespace modules\mulgach\hmvc\scaffapi
+namespace modules\mulgach
 {
 	use Core;
-	require_once url_seg_add(__DIR__,"widget.php");
+	//require_once url_seg_add(__DIR__,"widget.php");
 
-	class BaseController
+	class mul_Controller
 	{
 		VAR $_JS=array();
 		VAR $_CSS=array();
@@ -558,7 +558,7 @@ namespace modules\mulgach\hmvc\scaffapi
 		
 	}
 	
-	class AuthController extends BaseController 
+	class AuthController extends mul_Controller 
 	{
 		
 		public function ActionLogin()

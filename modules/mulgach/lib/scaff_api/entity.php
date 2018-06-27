@@ -1,5 +1,5 @@
 <?php
-namespace modules\mulgach\hmvc\scaffapi{
+namespace modules\mulgach\scaffapi{
 	use Core;
 	// Работа с сущностями
 	class scaff_entity {

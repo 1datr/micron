@@ -1,7 +1,8 @@
 <?php
 namespace __master\Frontend;
 
-class SiteController extends \BaseController
+use modules\mulgach\mul_Controller as mul_Controller;
+class SiteController extends mul_Controller
 {
 	public function Rules()
 	{

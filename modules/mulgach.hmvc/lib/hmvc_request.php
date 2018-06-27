@@ -26,7 +26,7 @@ use Core;
 				$this->_args=$args;
 			}
 	
-		}
+		}		
 	
 		function save_args_as_real()
 		{

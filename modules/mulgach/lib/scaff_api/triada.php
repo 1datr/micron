@@ -1,6 +1,7 @@
 <?php
-namespace modules\mulgach\hmvc\scaffapi{
+namespace modules\mulgach\scaffapi{
 	use Core;
+	use modules\mulgach\mul_Controller as BaseController;
 	
 	class scaff_triada
 	{
@@ -9,6 +10,7 @@ namespace modules\mulgach\hmvc\scaffapi{
 		VAR $_PARENT_CONF;
 		VAR $_EP;
 		VAR $NAME;
+		VAR $_CONTROLLER_CLASS;
 		VAR $_CONTROLLER_PATH;
 		VAR $_MODEL_PATH;
 		VAR $_BASEFILE_PATH;
@@ -22,6 +24,8 @@ namespace modules\mulgach\hmvc\scaffapi{
 			$this->_EP = $ep;
 			$this->NAME = $triada;
 			$this->_PATH = url_seg_add( $conf_obj->_PATH, $ep, 'hmvc', $triada);
+			$this->_CONTROLLER_PATH = url_seg_add($this->_PATH,ucfirst($triada)."Controller.php");
+			$this->_CONTROLLER_CLASS = UcaseFirst($conf_obj->_NAME).'\\'.UcaseFirst($ep)."\\".ucfirst($triada)."Controller";
 		//	echo $this->_PATH;
 			if(!file_exists($this->_PATH) || $create)
 			{
@@ -184,7 +188,7 @@ namespace modules\mulgach\hmvc\scaffapi{
 				$controller_name = ucfirst($this->_PARENT_CONF->_NAME).'\\'.ucfirst($this->_EP).'\\'.$controller_name;
 				$con_obj = new $controller_name('#test');
 				
-				$con_obj->_action_exists($act);
+				return $con_obj->_action_exists($act);
 			}
 			return false;
 			

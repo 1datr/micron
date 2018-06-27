@@ -1,7 +1,8 @@
 <?php
-namespace modules\mulgach\hmvc\scaffapi
+namespace modules\mulgach\scaffapi
 {
 	use Core;
+	use modules\mulgach\mul_Controller as BaseController;
 	
 	class scaff_conf 
 	{
@@ -12,11 +13,11 @@ namespace modules\mulgach\hmvc\scaffapi
 		
 		function __construct($conf,$opts=array())
 		{
-			GLOBAL $_BASEDIR;
+			//GLOBAL $_BASEDIR;
 			$this->_NAME=$conf;
 			def_options(array('conf_dir'=>'conf','rewrite'=>false), $opts);
 						
-			$this->_PATH = url_seg_add($_BASEDIR,$opts['conf_dir'],$conf);
+			$this->_PATH = url_seg_add($opts['conf_dir'],$conf);
 			
 			if(file_exists($this->_PATH) && !$opts['rewrite'] )
 				return;

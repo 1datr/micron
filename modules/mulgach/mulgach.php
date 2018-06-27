@@ -41,8 +41,8 @@ class Module extends Core\Module
 			if(isset($GLOBALS['_MUL_CFG']))			
 				$this->_CONFIG = $GLOBALS['_MUL_CFG'];
 			else 
-				$this->_CONFIG = $fp_conf->get_settings()['CONF'];
-			$this->_CURR_CONF_DIR = url_seg_add($this->_MUL_PATH,"conf",$this->_CONFIG);
+				$this->_CONFIG = $fp_conf->get_settings()['_MUL_CONF'];
+			$this->_CURR_CONF_DIR = url_seg_add($this->_PATH,"conf");
 			//echo $this->_CURR_CONF_DIR." > ";
 			//print_r($this);
 		} 
@@ -63,6 +63,7 @@ class Module extends Core\Module
 		
 		public function AfterLoad()
 		{
+			$this->load_lib('BaseController');
 			$this->load_lib('scaff_api/index');
 		
 		}

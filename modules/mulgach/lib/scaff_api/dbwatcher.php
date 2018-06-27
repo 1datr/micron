@@ -1,6 +1,6 @@
 <?php
 // Вытаскивает данные из базы нужные для скаффолдинга
-namespace modules\mulgach\hmvc\scaffapi{
+namespace modules\mulgach\scaffapi{
 	use Core;
 	
 	class DbWatcher {
