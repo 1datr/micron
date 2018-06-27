@@ -33,7 +33,8 @@ class Module extends Core\Module
 		
 		private function load_mulgach()
 		{
-			$this->_MUL_PATH = $this->_L_SETTINGS['muldir'];
+			GLOBAL $_BASEDIR;
+			$this->_MUL_PATH = url_seg_add($_BASEDIR, $this->_L_SETTINGS['muldir']);
 			$this->_CFG_PATH = url_seg_add($this->_MUL_PATH,'conf.php');	
 			$this->_EP = (isset($GLOBALS['EP'])?$GLOBALS['EP']:'frontend');
 			
@@ -42,7 +43,7 @@ class Module extends Core\Module
 				$this->_CONFIG = $GLOBALS['_MUL_CFG'];
 			else 
 				$this->_CONFIG = $fp_conf->get_settings()['_MUL_CONF'];
-			$this->_CURR_CONF_DIR = url_seg_add($this->_PATH,"conf");
+			$this->_CURR_CONF_DIR = url_seg_add($this->_MUL_PATH,"conf");
 			//echo $this->_CURR_CONF_DIR." > ";
 			//print_r($this);
 		} 
