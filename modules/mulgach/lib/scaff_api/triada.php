@@ -134,6 +134,95 @@ namespace modules\mulgach\scaffapi{
 			}
 			return false;
 		}
+		
+		function make_args($controller_name,$controller_object,$_action_name,&$request)
+		{
+			$class = new \ReflectionClass($controller_name);
+			$method = $class->getMethod($_action_name);
+			$method_params = $method->getParameters();
+			$method_args=array();
+		
+			// Проход по параметрам
+			$idx_in_req_args=0;
+		
+			$_RULES = $controller_object->Rules();
+			$arg_info = array();
+			if(!empty($_RULES['action_args']))
+			{
+				$arg_info = $_RULES['action_args'][$request->_action];
+			}
+		
+			//print_r($arg_info);
+			$request->save_args_as_real();
+		
+			$_fun_map = array();
+			foreach ($method_params as $idx => $arg)
+			{
+				//	print_r($arg);
+				$_fun_map[]=$arg->name;
+				if(isset($request->_args[$arg->name]))
+				{
+					$_val = $request->_args[$arg->name];
+					if(!empty($arg_info[$arg->name]))
+					{
+						//	echo '$_val=('.$arg_info[$arg->name].')$request->_args[$arg->name];';
+						eval('$_val=('.$arg_info[$arg->name].')$request->_args[$arg->name];');
+					}
+					else
+					{
+						$_val=$request->_args[$arg->name];
+					}
+					$method_args[] = $_val;
+				}
+				elseif(isset($request->_args[$idx_in_req_args]))
+				{
+					//	echo "+ $idx_in_req_args +";
+		
+					if(isset($arg_info[$arg->name]))
+					{
+						//	echo '$request->_args[$arg->name]=('.$arg_info[$arg->name].')$request->_args[$idx_in_req_args];';
+						eval('$request->_args[$arg->name]=('.$arg_info[$arg->name].')$request->_args[$idx_in_req_args];');
+					}
+					else
+					{
+						$request->_args[$arg->name]=$request->_args[$idx_in_req_args];
+					}
+		
+					$request->delete_arg($idx_in_req_args);
+					$method_args[$arg->name]=$request->_args[$arg->name];
+						
+					//	print_r($method_args);
+					//getType
+					$idx_in_req_args++;
+				}
+				else
+				{
+					if($arg->isDefaultValueAvailable())
+					{
+						$defval = $arg->getDefaultValue();
+						$method_args[$arg->name]=$defval;
+						$request->_args[$arg->name]=$defval;
+					}
+				}
+			}
+		
+			//  print_r($method_args);
+			$request->setmap($_fun_map);
+		
+			//print_r($request);
+			if(count($method_args)!=count($method_params))
+			{
+				//	echo ";;xxx;;";
+				return NULL;
+			}
+			return $method_args;
+		}
+		
+		
+		function action_info($_action)
+		{
+			return ['action'=>$_action,'action_func'=>"Action".ucfirst($_action)];
+		}
 		// файл модели
 		function make_model($_params,$rewrite_all=true)
 		{

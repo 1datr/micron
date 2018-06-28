@@ -26,7 +26,7 @@ namespace modules\mulgach
 			if($_env_info=='#test')
 				return ;
 	
-				$this->_CONTROLLER_DIR = $_env_info['_CONTROLLER_DIR'];
+			/*	$this->_CONTROLLER_DIR = $_env_info['_CONTROLLER_DIR'];
 				$this->_ENV = $_env_info['_ENV'];
 	
 				$conn = get_connection();
@@ -47,7 +47,7 @@ namespace modules\mulgach
 					$model_env = $this->_ENV;
 					$model_env['_CONTROLLER']=$this;
 					$this->_MODEL = new $model_class_name($this->_CONTROLLER_DIR,$model_env);
-				}
+				}*/
 		}
 	
 		public static function ControllerName($trname)

@@ -9,6 +9,7 @@ namespace modules\mulgach\hmvc {
 		{		
 			VAR $_INFO;
 			VAR $CONF_OBJ;
+			VAR $_CONTROLLER;
 			
 			public function AfterLoad()
 			{
@@ -75,23 +76,10 @@ namespace modules\mulgach\hmvc {
 			{
 					
 				GLOBAL $_BASEDIR;
-				$bad_result = array('ok'=>false);
-			
-		//		print_r($triada);
+				$bad_result = array('ok'=>false);		
 				
 				require_once $triada->_CONTROLLER_PATH;
-			/*
-				if( file_exists($con_info['_CONTROLLER_FILE']))
-				{
-					require_once $con_info['_CONTROLLER_FILE'];
-				}
-				else
-				{
-					return array_merge($bad_result,array('error'=>'404'));
-				}
 			
-				$controller_name = $con_info['_CONTROLLER_CLASS'];
-			*/
 				// получить страницу из контроллера
 				ob_start();
 			
@@ -99,10 +87,13 @@ namespace modules\mulgach\hmvc {
 			
 				$this->_CONTROLLER = new $controller_name(
 						array(
-								'_CONTROLLER_DIR' => $con_info['_DIR_CONTROLLER'],
-								'_ENV'=>$this->_ENV_INFO,
+								//'_CONTROLLER_DIR' => $con_info['_DIR_CONTROLLER'],
+								//'_ENV'=>$this->_ENV_INFO,
 						));
-				$_action_name = $con_info['_ACTION'];
+				
+				$action_info = $triada->action_info($request->_action);
+				
+				$_action_name = $action_info['action_func'];
 			
 				// “акого метода нет в контроллере попытка 1
 			
@@ -118,7 +109,7 @@ namespace modules\mulgach\hmvc {
 			
 				// ѕараметры метода
 			
-				$method_args = $this->make_args($controller_name, $this->_CONTROLLER, $_action_name, $request);
+				$method_args = $triada->make_args($controller_name, $this->_CONTROLLER, $_action_name, $request);
 				//print_r($method_args);
 				if($method_args==NULL && !is_array($method_args) )
 				{
